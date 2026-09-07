@@ -416,7 +416,8 @@ public abstract class Channel {
 
   public void setLocalWindowSizeMax(int size) {
     if (isConnected()) {
-      throw new IllegalStateException("local window size max cannot be changed after channel is connected");
+      throw new IllegalStateException(
+          "local window size max cannot be changed after channel is connected");
     }
     if (size <= 0) {
       throw new IllegalArgumentException("local window size max must be positive: " + size);
@@ -426,22 +427,25 @@ public abstract class Channel {
 
   public void setLocalWindowSize(int size) {
     if (isConnected()) {
-      throw new IllegalStateException("local window size cannot be changed after channel is connected");
+      throw new IllegalStateException(
+          "local window size cannot be changed after channel is connected");
     }
     if (size <= 0 || size > lwsize_max) {
       throw new IllegalArgumentException(
-          "local window size must be positive and not exceed local window size max (" + lwsize_max + "): " + size);
+          "local window size must be positive and not exceed local window size max (" + lwsize_max
+              + "): " + size);
     }
     this.lwsize = size;
   }
 
   public void setLocalPacketSize(int size) {
     if (isConnected()) {
-      throw new IllegalStateException("local packet size cannot be changed after channel is connected");
+      throw new IllegalStateException(
+          "local packet size cannot be changed after channel is connected");
     }
     if (size <= 0 || size > MAX_LOCAL_PACKET_SIZE) {
-      throw new IllegalArgumentException(
-          "local packet size must be positive and not exceed " + MAX_LOCAL_PACKET_SIZE + ": " + size);
+      throw new IllegalArgumentException("local packet size must be positive and not exceed "
+          + MAX_LOCAL_PACKET_SIZE + ": " + size);
     }
     this.lmpsize = size;
   }
