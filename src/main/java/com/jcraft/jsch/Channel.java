@@ -406,15 +406,15 @@ public abstract class Channel {
     }
   }
 
-  void setLocalWindowSizeMax(int foo) {
+  public void setLocalWindowSizeMax(int foo) {
     this.lwsize_max = foo;
   }
 
-  void setLocalWindowSize(int foo) {
+  public void setLocalWindowSize(int foo) {
     this.lwsize = foo;
   }
 
-  void setLocalPacketSize(int foo) {
+  public void setLocalPacketSize(int foo) {
     this.lmpsize = foo;
   }
 
