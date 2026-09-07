@@ -46,6 +46,10 @@ public abstract class Channel {
 
   private static final AtomicInteger index = new AtomicInteger();
 
+  // sanity cap for setLocalPacketSize: lmpsize is used to allocate a Buffer of that size
+  // (e.g. ChannelSftp.start()), so an unbounded value could trigger an excessive allocation
+  private static final int MAX_LOCAL_PACKET_SIZE = 16 * 1024 * 1024;
+
   int id;
   volatile int recipient = -1;
   protected byte[] type = Util.str2byte("foo");
@@ -431,8 +435,9 @@ public abstract class Channel {
     if (isConnected()) {
       throw new IllegalStateException("local packet size cannot be changed after channel is connected");
     }
-    if (size <= 0) {
-      throw new IllegalArgumentException("local packet size must be positive: " + size);
+    if (size <= 0 || size > MAX_LOCAL_PACKET_SIZE) {
+      throw new IllegalArgumentException(
+          "local packet size must be positive and not exceed " + MAX_LOCAL_PACKET_SIZE + ": " + size);
     }
     this.lmpsize = size;
   }
