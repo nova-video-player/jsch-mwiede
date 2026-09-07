@@ -46,9 +46,13 @@ public abstract class Channel {
 
   private static final AtomicInteger index = new AtomicInteger();
 
-  // sanity cap for setLocalPacketSize: lmpsize is used to allocate a Buffer of that size
-  // (e.g. ChannelSftp.start()), so an unbounded value could trigger an excessive allocation
-  private static final int MAX_LOCAL_PACKET_SIZE = 16 * 1024 * 1024;
+  // sanity cap for setLocalPacketSize: lmpsize is both used to allocate a Buffer of that size
+  // (e.g. ChannelSftp.start()) and advertised to the server as the max size of a single
+  // CHANNEL_DATA payload it may send us. That payload is wrapped in an SSH packet together with
+  // ~9 bytes of channel-data framing plus padding, so it must stay comfortably under
+  // Session.PACKET_MAX_SIZE (RFC 4253 6.1 Maximum Packet Length) or the resulting packet gets
+  // discarded by the transport layer, killing the connection.
+  private static final int MAX_LOCAL_PACKET_SIZE = Session.PACKET_MAX_SIZE - 4096;
 
   int id;
   volatile int recipient = -1;
