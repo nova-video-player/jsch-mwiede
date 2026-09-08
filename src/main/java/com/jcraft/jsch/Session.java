@@ -1978,7 +1978,7 @@ public class Session {
               break;
             }
             int len = length[0];
-            channel.setLocalWindowSize(channel.lwsize - len);
+            channel.updateLocalWindowSize(channel.lwsize - len);
             if (channel.lwsize < channel.lwsize_max / 2) {
               packet.reset();
               buf.putByte((byte) SSH_MSG_CHANNEL_WINDOW_ADJUST);
@@ -1988,7 +1988,7 @@ public class Session {
                 if (!channel.close)
                   write(packet);
               }
-              channel.setLocalWindowSize(channel.lwsize_max);
+              channel.updateLocalWindowSize(channel.lwsize_max);
             }
             break;
 
@@ -2011,7 +2011,7 @@ public class Session {
             channel.write_ext(foo, start[0], length[0]);
 
             len = length[0];
-            channel.setLocalWindowSize(channel.lwsize - len);
+            channel.updateLocalWindowSize(channel.lwsize - len);
             if (channel.lwsize < channel.lwsize_max / 2) {
               packet.reset();
               buf.putByte((byte) SSH_MSG_CHANNEL_WINDOW_ADJUST);
@@ -2021,7 +2021,7 @@ public class Session {
                 if (!channel.close)
                   write(packet);
               }
-              channel.setLocalWindowSize(channel.lwsize_max);
+              channel.updateLocalWindowSize(channel.lwsize_max);
             }
             break;
 

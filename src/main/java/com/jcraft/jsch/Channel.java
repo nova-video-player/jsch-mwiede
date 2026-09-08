@@ -438,6 +438,21 @@ public abstract class Channel {
     this.lwsize = size;
   }
 
+  // Session's own flow-control bookkeeping (see SSH_MSG_CHANNEL_DATA/SSH_MSG_CHANNEL_EXTENDED_DATA
+  // handling) needs to update the local window continuously while the channel is connected, and can
+  // legitimately drive it down to 0 before resetting it to lwsize_max. That is a different contract
+  // than the public setLocalWindowSize, which is meant for pre-connect configuration by consumers,
+  // so keep this bookkeeping update package-private and unrestricted (besides the lwsize_max
+  // bound).
+  void updateLocalWindowSize(int size) {
+    if (size < 0 || size > lwsize_max) {
+      throw new IllegalArgumentException(
+          "local window size must not be negative and must not exceed local window size max ("
+              + lwsize_max + "): " + size);
+    }
+    this.lwsize = size;
+  }
+
   public void setLocalPacketSize(int size) {
     if (isConnected()) {
       throw new IllegalStateException(
