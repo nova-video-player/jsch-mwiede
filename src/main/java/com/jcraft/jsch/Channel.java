@@ -414,28 +414,62 @@ public abstract class Channel {
     }
   }
 
-  public void setLocalWindowSizeMax(int size) {
+  /**
+   * Sets the maximum local window size.
+   *
+   * @param size the maximum local window size in bytes
+   * @throws JSchException if the channel is already connected, if {@code size} is not positive, or
+   *         if {@code size} is less than the current local window size
+   */
+  public void setLocalWindowSizeMax(int size) throws JSchException {
     if (isConnected()) {
-      throw new IllegalStateException(
-          "local window size max cannot be changed after channel is connected");
+      throw new JSchException("local window size max cannot be changed after channel is connected");
     }
     if (size <= 0) {
-      throw new IllegalArgumentException("local window size max must be positive: " + size);
+      throw new JSchException("local window size max must be positive: " + size);
+    }
+    if (size < lwsize) {
+      throw new JSchException("local window size max must not be less than local window size ("
+          + lwsize + "): " + size);
     }
     this.lwsize_max = size;
   }
 
-  public void setLocalWindowSize(int size) {
+  /**
+   * Gets the maximum local window size.
+   *
+   * @return the maximum local window size in bytes
+   */
+  public int getLocalWindowSizeMax() {
+    return this.lwsize_max;
+  }
+
+  /**
+   * Sets the current local window size.
+   *
+   * @param size the local window size in bytes
+   * @throws JSchException if the channel is already connected, if {@code size} is not positive, or
+   *         if {@code size} exceeds the maximum local window size
+   */
+  public void setLocalWindowSize(int size) throws JSchException {
     if (isConnected()) {
-      throw new IllegalStateException(
-          "local window size cannot be changed after channel is connected");
+      throw new JSchException("local window size cannot be changed after channel is connected");
     }
     if (size <= 0 || size > lwsize_max) {
-      throw new IllegalArgumentException(
+      throw new JSchException(
           "local window size must be positive and not exceed local window size max (" + lwsize_max
               + "): " + size);
     }
     this.lwsize = size;
+  }
+
+  /**
+   * Gets the current local window size.
+   *
+   * @return the current local window size in bytes
+   */
+  public int getLocalWindowSize() {
+    return this.lwsize;
   }
 
   // Session's own flow-control bookkeeping (see SSH_MSG_CHANNEL_DATA/SSH_MSG_CHANNEL_EXTENDED_DATA
@@ -448,16 +482,31 @@ public abstract class Channel {
     this.lwsize = size;
   }
 
-  public void setLocalPacketSize(int size) {
+  /**
+   * Sets the maximum local packet size.
+   *
+   * @param size the maximum local packet size in bytes
+   * @throws JSchException if the channel is already connected, if {@code size} is not positive, or
+   *         if {@code size} exceeds the maximum allowed packet size
+   */
+  public void setLocalPacketSize(int size) throws JSchException {
     if (isConnected()) {
-      throw new IllegalStateException(
-          "local packet size cannot be changed after channel is connected");
+      throw new JSchException("local packet size cannot be changed after channel is connected");
     }
     if (size <= 0 || size > MAX_LOCAL_PACKET_SIZE) {
-      throw new IllegalArgumentException("local packet size must be positive and not exceed "
+      throw new JSchException("local packet size must be positive and not exceed "
           + MAX_LOCAL_PACKET_SIZE + ": " + size);
     }
     this.lmpsize = size;
+  }
+
+  /**
+   * Gets the maximum local packet size.
+   *
+   * @return the maximum local packet size in bytes
+   */
+  public int getLocalPacketSize() {
+    return this.lmpsize;
   }
 
   synchronized void setRemoteWindowSize(long foo) {
