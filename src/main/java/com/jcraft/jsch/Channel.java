@@ -450,15 +450,6 @@ public abstract class Channel {
   }
 
   /**
-   * Gets the current local window size.
-   *
-   * @return the current local window size in bytes
-   */
-  public int getLocalWindowSize() {
-    return this.lwsize;
-  }
-
-  /**
    * Sets the maximum local packet size.
    *
    * @param size the maximum local packet size in bytes
