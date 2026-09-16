@@ -417,9 +417,13 @@ public abstract class Channel {
   /**
    * Sets the maximum local window size.
    *
+   * <p>
+   * Both the maximum local window size and the initial local window size are set to the specified
+   * {@code size}.
+   * </p>
+   *
    * @param size the maximum local window size in bytes
-   * @throws JSchException if the channel is already connected, if {@code size} is not positive, or
-   *         if {@code size} is less than the current local window size
+   * @throws JSchException if the channel is already connected or if {@code size} is not positive
    */
   public void setLocalWindowSizeMax(int size) throws JSchException {
     if (isConnected()) {
@@ -428,11 +432,8 @@ public abstract class Channel {
     if (size <= 0) {
       throw new JSchException("local window size max must be positive: " + size);
     }
-    if (size < lwsize) {
-      throw new JSchException("local window size max must not be less than local window size ("
-          + lwsize + "): " + size);
-    }
     this.lwsize_max = size;
+    this.lwsize = size;
   }
 
   /**
@@ -444,23 +445,8 @@ public abstract class Channel {
     return this.lwsize_max;
   }
 
-  /**
-   * Sets the current local window size.
-   *
-   * @param size the local window size in bytes
-   * @throws JSchException if the channel is already connected, if {@code size} is not positive, or
-   *         if {@code size} exceeds the maximum local window size
-   */
-  public void setLocalWindowSize(int size) throws JSchException {
-    if (isConnected()) {
-      throw new JSchException("local window size cannot be changed after channel is connected");
-    }
-    if (size <= 0 || size > lwsize_max) {
-      throw new JSchException(
-          "local window size must be positive and not exceed local window size max (" + lwsize_max
-              + "): " + size);
-    }
-    this.lwsize = size;
+  void setLocalWindowSize(int foo) {
+    this.lwsize = foo;
   }
 
   /**
@@ -470,16 +456,6 @@ public abstract class Channel {
    */
   public int getLocalWindowSize() {
     return this.lwsize;
-  }
-
-  // Session's own flow-control bookkeeping (see SSH_MSG_CHANNEL_DATA/SSH_MSG_CHANNEL_EXTENDED_DATA
-  // handling) needs to update the local window continuously while the channel is connected, and can
-  // legitimately drive it down to 0 (or even negative if a server bursts beyond the window) before
-  // resetting it to lwsize_max. That is a different contract than the public setLocalWindowSize,
-  // which is meant for pre-connect configuration by consumers, so keep this bookkeeping update
-  // package-private and unconstrained.
-  void updateLocalWindowSize(int size) {
-    this.lwsize = size;
   }
 
   /**
